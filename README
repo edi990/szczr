@@ -1,1 +1,2 @@
 Po stronie klienta potrzebna jest klasa ComClient (pakiet Client) oraz ComData z pakietu Protocol.
+Trzeba ustaliæ w jakiej formie bêd¹ przesy³ane dane, kto robi który modu³ i... zaczynamy kodziæ! :)
