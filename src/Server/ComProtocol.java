@@ -1,6 +1,6 @@
-package Server;
+package server;
 
-import Protocol.ComData;
+import protocol.ComData;
 
 class ComProtocol
 {

@@ -1,7 +1,7 @@
-package Server;
+package server;
 
 @SuppressWarnings("serial")
-public class UnknownClientException extends Exception {
+class UnknownClientException extends Exception {
 	
 	private String client;
 	

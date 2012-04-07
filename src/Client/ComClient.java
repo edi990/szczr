@@ -1,9 +1,10 @@
-package Client;
+package client;
 
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import Protocol.ComData;
+
+import protocol.ComData;
 
 public class ComClient
 {

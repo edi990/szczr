@@ -1,4 +1,4 @@
-package Server;
+package server;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -6,7 +6,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 /**
  * Server Data Class- przechowuje wszystkie dane symulacji.
  */
-public class ComServerData
+class ComServerData
 {
 	private final ReentrantReadWriteLock fLock = new ReentrantReadWriteLock();
 	private final Lock fReadLock = fLock.readLock();

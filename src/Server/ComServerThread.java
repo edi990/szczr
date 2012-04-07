@@ -1,10 +1,11 @@
-package Server;
+package server;
 
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 
-import Protocol.*;
+import protocol.*;
+
 
 /**
  * A class extended from a Thread; Responsible to service one client
