@@ -6,52 +6,77 @@ import java.net.UnknownHostException;
 
 import protocol.ComData;
 
+/**
+ * Klasa obs³uguj¹ca po³¹czenie z serwerem po stronie klienta.
+ *
+ */
 public class ComClient
 {
+	/**
+	 * uchwyt po³¹czenia z serwerem
+	 */
 	private Socket				comSocket;
+	
+	/**
+	 * strumieñ wyjœciowy
+	 */
 	private ObjectOutputStream	oOut;
+	
+	/**
+	 * strumieñ wejœciowy
+	 */
 	private ObjectInputStream	oIn;
+	
+	/**
+	 * czy po³¹czenie jest nawi¹zane
+	 */
 	private boolean				IsItOpen = false;
+	
+	/**
+	 * czy mo¿na wys³aæ zapytanie
+	 */
 	private boolean				requesting = true;
 
 	/**
-	 * Main program to start the Client
-	 * @throws InterruptedException 
+	 * Tworzy po³¹czenie z serwerem.
+	 * @param who identyfikator klienta- GUI, CARS, LIGHTS (inne niedozwolone)
+	 * @throws IOException 
+	 * @throws UnknownHostException 
 	 */
-	public static void main(String[] args) throws IOException, InterruptedException
-	{	
-		ComClient cli = new ComClient();
-		cli.openCom("localhost", 6666);
-		if(cli.isItOpen()){
+	public ComClient(final String who) throws UnknownHostException, IOException{
+		openCom("localhost", 6666);
+		if(isItOpen()){
 			ComData data = new ComData();
-			cli.getServerData(data);
-			if(data.comData.equals("Ready:")){
-				cli.sendDataToServer(new ComData("GUI")); // GUI, CARS, LIGHTS (inne niedozwolone)
-				cli.getServerData(data);
-				
-				// g³ówna pêtla klienta
-				while(cli.requesting){
-					
-					cli.sendDataToServer(new ComData("zapytanie"));
-					cli.getServerData(data);
-					// odpowiedŸ w data.comData
-					
-					Thread.sleep(10000);
-					
-					break;
-					
-				}
-				
-				cli.sendDataToServer(new ComData("!EXIT.@"));
-				cli.getServerData(data);
+			getServerData(data);
+			if(data.message.equals("Ready:")){
+				sendDataToServer(new ComData(who));
+				getServerData(data);
 			}
-			
 		}
-		cli.closeCom();
 	}
 
 	/**
-	 * Open Socket
+	 * Wysy³a obiekt z danymi zapytania do serwera i odbiera odpowiedŸ.
+	 * @param data obiekt z danymi przeznaczonymi do wys³ania
+	 * @return obiekt z odpowiedzi¹
+	 * @see protocol.ComData
+	 * @throws IOException 
+	 */
+	public ComData send(ComData data) throws IOException{
+		if(requesting){
+			sendDataToServer(data);
+			getServerData(data);
+			return data;
+		}
+		return null;
+	}
+
+	/**
+	 * Otwiera po³¹czenie z serwerem.
+	 * @param sServerName adres serwera
+	 * @param iPortNumber nr portu
+	 * @throws UnknownHostException
+	 * @throws IOException
 	 */
 	public void openCom(String sServerName, int iPortNumber) throws UnknownHostException, IOException  
 	{
@@ -72,7 +97,8 @@ public class ComClient
 	}
 
 	/**
-	 * Check if Socket is open
+	 * Sprawdza czy po³¹czenie zosta³o nawi¹zane.
+	 * @return true- nawi¹zano po³¹czenie
 	 */
 	public boolean isItOpen()
 	{
@@ -80,36 +106,41 @@ public class ComClient
 	}
 
 	/**
-	 * Get data string from the Server
+	 * Odbiera odpowiedŸ od serwera.
+	 * @param tServData referencja do obiektu w którym zostanie zapisana odpowiedŸ
+	 * @throws IOException
 	 */
 	public void getServerData(ComData tServData) throws IOException
 	{
-		tServData.comData = "";
+		tServData.comData = null;
 		try {
 			tServData.copy((ComData)oIn.readObject());
 		} catch (ClassNotFoundException e){
 			System.out.println("B³êdne dane...");
 		} 
 		
-		System.out.println("OdpowiedŸ serwera: " + tServData.comData);
-		if (tServData.comData.equals("EXIT.")){
+		System.out.println("OdpowiedŸ serwera: " + tServData.message);
+		if (tServData.message.equals("EXIT.")){
 			tServData.bExit = true;
 		}
 		return;
 	}
 
 	/**
-	 * Send data to the Server
+	 * Wysy³a dane do serwera.
+	 * @param tServData dane do wys³ania
+	 * @throws IOException
 	 */
 	public void sendDataToServer(ComData tServData) throws IOException
 	{
-		System.out.println("Wysy³am: " + tServData.comData);
+		System.out.println("Wysy³am: " + tServData.message);
 		oOut.writeObject(tServData);
 		return;
 	}
 
 	/**
-	 * Close Socket
+	 * Zamyka po³¹czenie.
+	 * @throws IOException
 	 */
 	public void closeCom() throws IOException
 	{
@@ -117,5 +148,20 @@ public class ComClient
 		oIn.close();
 		comSocket.close();     
 		IsItOpen = false;
+	}
+
+	/**
+	 * Koñczy wymianê danych z serwerem.
+	 * @throws IOException
+	 */
+	public void finalize() throws IOException{
+		ComData data = null;
+		try {
+			sendDataToServer(new ComData("!EXIT.@"));
+			getServerData(data);
+			closeCom();
+		} catch (IOException e) {
+			throw e;
+		}
 	}
 }

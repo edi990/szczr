@@ -4,32 +4,53 @@ import java.io.IOException;
 import java.net.ServerSocket;
 
 /**
- * Main Server Class- Listening on a port for client. If there is a client,
- * starts a new Thread and goes back to listening for further clients.
+ * G³ówna klasa serwera.<br/>
+ * Nas³uchuje na podanym porcie, kiedy nadchodzi zapytanie od klienta tworzy nowy w¹tek do jego obs³ugi i wraca do nas³uchiwania.<br/>
+ * Obiekt jest Singletonem.
+ * @see ComServerThread
  */
 final public class ComServer 
 {
+	/**
+	 * referencja do jedynej instancji serwera
+	 */
 	private static ComServer instance = null;
+	
+	/**
+	 * dane symulacji
+	 * @see ComServerData
+	 */
 	private ComServerData data;
+
+	/**
+	 * czy nas³uchuje
+	 */
 	static boolean GL_listening = true;
 	
 	/**
-	 * Main program to start the Server
+	 * Inicjalizacja serwera.
+	 * @param args argumenty wywo³ania (nieistotne)
 	 */
-	public static void main(String[] args) throws IOException
+	public static void main(String[] args)
 	{
-		ComServer.getInstance().listen(); 
+		try {
+			ComServer.getInstance().listen();
+		} catch (IOException e) {
+			System.err.println("Wyst¹pi³ b³¹d...");
+		} 
 	}
 
 	/**
-	 * Create server data object
+	 * Tworzy obiekt danych symulacji.
+	 * @see ComServerData
 	 */
-	protected ComServer() {
+	private ComServer() {
 		data = new ComServerData();
 	}
 
 	/**
-	 * Singleton getInstance method
+	 * Tworzy/zwraca referencjê do jedynej instancji serwera.
+	 * @return referencja do obiektu serwera
 	 */
 	public static ComServer getInstance() {
 		if(instance == null) {
@@ -39,7 +60,9 @@ final public class ComServer
 	}
 
 	/**
-	 * Server method; Listen for client
+	 * Nas³uchuje zapytañ na podanym porcie.
+	 * @return kod b³êdu
+	 * @throws IOException
 	 */
 	public int listen() throws IOException
 	{
@@ -67,6 +90,11 @@ final public class ComServer
 		return 0;
 	}
 
+	/**
+	 * Dostêp do danych symulacji.
+	 * @return referencja do obiektu z danymi symulacji.
+	 * @see ComServerData
+	 */
 	public ComServerData getData() {
 		return data;
 	}

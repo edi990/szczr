@@ -8,27 +8,49 @@ import protocol.*;
 
 
 /**
- * A class extended from a Thread; Responsible to service one client
+ * Klasa w¹tku obs³uguj¹cego zapytania od jednego klienta.
  */
 class ComServerThread extends Thread
 {
+	/**
+	 * uchwyt po³¹czenia
+	 */
 	private Socket clientSocket = null;
+
+	/**
+	 * paczka danych od klienta
+	 */
 	ComData tDataFromClient;
+
+	/**
+	 * paczka do wys³ania
+	 */
 	ComData tDataToClient;
+
+	/**
+	 * strumieñ wejœciowy
+	 */
 	ObjectInputStream oIn;
+
+	/**
+	 * strumieñ wyjœciowy
+	 */
 	ObjectOutputStream oOut;
 	
 	/**
-	 * Constructor
+	 * Inicjalizacja w¹tku.
+	 * @param socket uchwyt po³¹czenia
 	 */
-	public ComServerThread( Socket socket )
+	public ComServerThread(Socket socket)
 	{
 		super("ComServerThread");
 		this.clientSocket = socket;
 	}
 	
 	/**
-	 * Overrun from the Thread (super) class
+	 * Nas³ychiwanie zapytañ, przetwarzanie i odpowiedŸ do klienta.<br/>
+	 * Interpretacja zapytania i konstrukcja odpowiedzi:
+	 * @see ComProtocol
 	 */
 	public void run()
 	{
@@ -78,7 +100,10 @@ class ComServerThread extends Thread
 	}
 
 	/**
-	 * Get data from Client
+	 * Pobranie paczki danych ze strumienia wejœciowego.
+	 * @param oIn strumieñ wejœciowy.
+	 * @return paczka danych
+	 * @throws IOException
 	 */
 	private static ComData getDataFromClient(ObjectInputStream oIn) throws IOException                                                                         
 	{
@@ -92,16 +117,19 @@ class ComServerThread extends Thread
 				System.out.println("B³êdne dane od klienta...");
 			}
 		}
-		System.out.println("Otrzymano: " + tDataFromClient.comData);
+		System.out.println("Otrzymano: " + tDataFromClient.message);
 		return tDataFromClient;
 	}
 
 	/**
-	 * Send data to Client
+	 * Wys³anie paczki danych do strumienia wyjœciowego.
+	 * @param tDataToClient paczka danych dla klienta
+	 * @param oOut strumieñ wyjœciowy
+	 * @throws IOException
 	 */
 	private static void sendDataToClient(ComData tDataToClient, ObjectOutputStream oOut) throws IOException
 	{         
-		System.out.println("Wys³ano: " + tDataToClient.comData);
+		System.out.println("Wys³ano: " + tDataToClient.message);
 		oOut.writeObject(tDataToClient);
 		return;
 	}
